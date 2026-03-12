@@ -44,10 +44,10 @@ def build():
     result = subprocess.run(cmd)
     if result.returncode == 0:
         exe = f"dist/{APP_NAME}.exe"
-        print(f"\n✅ Build successful: {exe}")
+        print(f"\n Build successful: {exe}")
         print(f"   Size: {os.path.getsize(exe) / 1024 / 1024:.1f} MB")
     else:
-        print("\n❌ Build failed!")
+        print("\n Build failed!")
         sys.exit(1)
 
 
