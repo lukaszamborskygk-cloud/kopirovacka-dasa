@@ -1,5 +1,5 @@
 pyperclip==1.9.0
 keyboard==0.13.5
-Pillow==10.3.0
-pywin32==306
-pystray==0.19.5
+Pillow==12.1.1
+pywin32==311
+pystray==0.20.0
