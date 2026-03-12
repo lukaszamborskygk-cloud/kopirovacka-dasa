@@ -1,0 +1,62 @@
+name: Build Kopirovacka
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        pip install -r app/requirements.txt
+        pip install pyinstaller
+
+    - name: Build app EXE
+      run: python build.py
+
+    - name: Build Installer EXE
+      run: |
+        pip install pyinstaller
+        pyinstaller --onefile --windowed --name=Kopirovacka_Installer `
+          --add-binary="dist/Kopirovacka.exe;." `
+          installer/installer_gui.py
+
+    - name: Create release ZIP
+      run: |
+        mkdir release
+        copy dist\Kopirovacka_Installer.exe release\
+        Compress-Archive -Path release\* -DestinationPath Kopirovacka_Setup.zip
+
+    - name: Upload Release
+      uses: softprops/action-gh-release@v2
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: |
+          Kopirovacka_Setup.zip
+          dist/Kopirovacka.exe
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Upload artifact (for manual runs)
+      uses: actions/upload-artifact@v4
+      with:
+        name: Kopirovacka-Build
+        path: |
+          dist/Kopirovacka.exe
+          dist/Kopirovacka_Installer.exe
+          Kopirovacka_Setup.zip
